@@ -12,3 +12,12 @@
 # almost every API call. Whitelisted in the NAME zone only - actual
 # submitted values are still fully scanned.
 BasicRule wl:1310,1311 "mz:ARGS|NAME";
+
+# Some API calls (e.g. POST /auth/logout.json) send an empty or
+# non-JSON body while still setting Content-Type: application/json.
+# naxsi's JSON body parser then fails with its internal "invalid JSON"
+# (id 15) / "empty POST" (id 16) status and blocks unconditionally -
+# these aren't attack-pattern scores, just parser-status codes, so
+# whitelist them for BODY the same way wordpress.rules does for
+# wp-cron.php's similarly empty/non-standard POST body.
+BasicRule wl:15,16 "mz:BODY";
