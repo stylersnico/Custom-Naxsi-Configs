@@ -1,0 +1,13 @@
+# CheckMK naxsi whitelist - hand-written, NOT a community-maintained
+# ruleset (none exists for CheckMK). Scoped narrowly to fix confirmed
+# false positives from real traffic in naxsi_error.log; only extend
+# when a new false positive is confirmed there, not speculatively.
+
+# Login password field: a password containing a single quote (or any
+# other special character) blocked login entirely (rule 1013). WAF
+# character scanning on a password field is not meaningful protection
+# - the backend handles it via hashing/prepared statements regardless
+# of content - and only creates login lockouts for users with strong/
+# varied passwords. Whitelisted entirely, same "wl:0" pattern used for
+# other inherently-arbitrary fields.
+BasicRule wl:0 "mz:$BODY_VAR:_password";
