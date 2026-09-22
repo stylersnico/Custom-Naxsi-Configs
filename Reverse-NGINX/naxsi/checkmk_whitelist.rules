@@ -11,3 +11,10 @@
 # varied passwords. Whitelisted entirely, same "wl:0" pattern used for
 # other inherently-arbitrary fields.
 BasicRule wl:0 "mz:$BODY_VAR:_password";
+
+# CheckMK's session cookies are heavily percent-encoded, tripping the
+# "double encoding" rule (1315) in the Cookie header on nearly every
+# request after login (2FA page, main dashboard...). Same false
+# positive already fixed for Nextcloud - reuse the same cookie-header
+# whitelist rule ID list wordpress.rules uses for its own cookies.
+BasicRule wl:1000,1001,1005,1007,1010,1011,1013,1100,1101,1200,1308,1309,1310,1311,1315 "mz:$HEADERS_VAR:cookie";
