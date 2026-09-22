@@ -40,6 +40,7 @@ server {
         CheckRule "$EVADE >= 4" BLOCK;
         CheckRule "$UPLOAD >= 8" BLOCK;
         CheckRule "$XSS >= 8" BLOCK;
+        include /usr/local/etc/nginx/naxsi/wikijs_whitelist.rules;
 
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
