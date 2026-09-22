@@ -7,6 +7,10 @@ server {
         ssl_certificate_key /etc/letsencrypt/live/nicolas-simond.ch/privkey.pem;
   error_log /var/log/nginx/jelly.nicolas-simond.ch/error.log;
   NaxsiLogFile /var/log/nginx/jelly.nicolas-simond.ch/naxsi_error.log;
+  # Higher than other vhosts: HLS/DASH segment streaming (especially
+  # with multiple devices/transcodes) opens many more concurrent
+  # short-lived requests than a typical web app.
+  limit_conn conn_jellyfin 150;
   client_max_body_size 40M;
   server_tokens off;
 

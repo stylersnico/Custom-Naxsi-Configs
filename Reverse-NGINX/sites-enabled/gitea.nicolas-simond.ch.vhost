@@ -16,6 +16,7 @@ server {
 
     error_log /var/log/nginx/gitea.nicolas-simond.ch/error.log;
     NaxsiLogFile /var/log/nginx/gitea.nicolas-simond.ch/naxsi_error.log;
+    limit_conn conn_gitea 100;
 
     if ($block_bot) {
         return 403;

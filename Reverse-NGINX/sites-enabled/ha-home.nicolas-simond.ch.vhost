@@ -29,6 +29,7 @@ server {
 
     error_log /var/log/nginx/ha-home.nicolas-simond.ch/error.log;
     NaxsiLogFile /var/log/nginx/ha-home.nicolas-simond.ch/naxsi_error.log;
+    limit_conn conn_ha 100;
 
     include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
 

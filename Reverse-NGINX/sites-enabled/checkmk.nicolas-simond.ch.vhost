@@ -8,6 +8,7 @@ server {
 
     error_log /var/log/nginx/checkmk.nicolas-simond.ch/error.log;
     NaxsiLogFile /var/log/nginx/checkmk.nicolas-simond.ch/naxsi_error.log;
+    limit_conn conn_checkmk 100;
 
     include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
 

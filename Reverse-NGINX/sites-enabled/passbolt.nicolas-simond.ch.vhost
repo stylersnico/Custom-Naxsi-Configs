@@ -14,6 +14,7 @@ server {
 
         error_log /var/log/nginx/passbolt.nicolas-simond.ch/error.log;
         NaxsiLogFile /var/log/nginx/passbolt.nicolas-simond.ch/naxsi_error.log;
+        limit_conn conn_passbolt 100;
 
     server_tokens off;
 

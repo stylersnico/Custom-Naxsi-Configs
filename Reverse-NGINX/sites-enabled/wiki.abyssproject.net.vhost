@@ -8,6 +8,7 @@ server {
 
         error_log /var/log/nginx/wiki.abyssproject.net/error.log;
         NaxsiLogFile /var/log/nginx/wiki.abyssproject.net/naxsi_error.log;
+        limit_conn conn_wiki 100;
 
         #Common headers for security
         more_set_headers "Content-Security-Policy : default-src https: data: 'unsafe-inline' 'unsafe-eval' always";
