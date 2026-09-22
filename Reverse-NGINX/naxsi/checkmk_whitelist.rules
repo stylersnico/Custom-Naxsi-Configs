@@ -19,15 +19,9 @@ BasicRule wl:0 "mz:$BODY_VAR:_password";
 # whitelist rule ID list wordpress.rules uses for its own cookies.
 BasicRule wl:1000,1001,1005,1007,1010,1011,1013,1100,1101,1200,1308,1309,1310,1311,1315 "mz:$HEADERS_VAR:cookie";
 
-# CheckMK's dashboard/widget system serializes its visualization state
-# (filters, layout, titles) as Python-repr-like structured data passed
-# through these fields - quote/paren-heavy by nature (scores up to 416
-# observed), not user free text to scan. Whitelisted entirely, same
-# "wl:0" pattern as WordPress's "content" / Wiki.js's "query" fields.
-BasicRule wl:0 "mz:$ARGS_VAR:names";
-BasicRule wl:0 "mz:$ARGS_VAR:context";
-BasicRule wl:0 "mz:$BODY_VAR:context";
-BasicRule wl:0 "mz:$BODY_VAR:content";
-BasicRule wl:0 "mz:$BODY_VAR:text";
-BasicRule wl:0 "mz:$BODY_VAR:general_settings";
-BasicRule wl:0 "mz:$BODY_VAR:url";
+# The dashboard/widget subsystem (widget_*.py, sidebar_snapin.py, the
+# dashboard API) is no longer naxsi-scanned at all - see the dedicated
+# "location ~" bypass in checkmk.nicolas-simond.ch.vhost. It used to
+# need six different fields whitelisted entirely (names, context,
+# content, text, general_settings, url), same reasoning as Wiki.js's
+# /graphql bypass.
