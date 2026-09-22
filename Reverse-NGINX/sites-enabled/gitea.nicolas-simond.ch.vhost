@@ -3,7 +3,10 @@ map $http_user_agent $block_bot {
     ~*(bot|crawler|spider|scrapy|curl|wget|python|httpclient) 1;
 }
 
-limit_req_zone $binary_remote_addr zone=gitea:10m rate=5r/s;
+# Raised from 5r/s: a single page load fans out into dozens of
+# concurrent JS chunk requests over HTTP/2, which was tripping this on
+# plain browsing (error_log: "limiting requests... by zone \"gitea\"").
+limit_req_zone $binary_remote_addr zone=gitea:10m rate=15r/s;
 
 server {
     listen 443 ssl;
@@ -37,7 +40,7 @@ location ~ ^/.*/(info/refs|git-upload-pack|git-receive-pack)$ {
 location ~ ^/api/ {
         allow 192.168.1.0/24;
 #       deny all;
-        limit_req zone=gitea burst=20 nodelay;
+        limit_req zone=gitea burst=40 nodelay;
         client_max_body_size 512M;
         proxy_pass http://192.168.1.10:3333;
         proxy_set_header Connection $http_connection;
@@ -51,7 +54,7 @@ location ~ ^/api/ {
         location / {
         allow 192.168.1.0/24;
 #       deny all;
-        limit_req zone=gitea burst=20 nodelay;
+        limit_req zone=gitea burst=40 nodelay;
         client_max_body_size 512M;
 
         # Naxsi WAF - core rules, standard thresholds. No community
