@@ -1,0 +1,13 @@
+# Umami naxsi whitelist - hand-written, NOT a community-maintained
+# ruleset (none exists for Umami). Scoped narrowly to fix confirmed
+# false positives from real traffic in naxsi_error.log; only extend
+# when a new false positive is confirmed there, not speculatively.
+
+# /api/send is the public, unauthenticated tracking endpoint - its
+# "title" field is the tracked page's own <title> content, submitted
+# verbatim by any visitor's browser on any tracked site. Titles
+# routinely contain a "|" separator (e.g. "My Blog | Home"), tripping
+# the SQL keyword-character rule (1005). This is arbitrary free-form
+# text, not something to enumerate - same "wl:0" pattern wordpress.rules
+# uses for its own free-form "content" field.
+BasicRule wl:0 "mz:$BODY_VAR:title";
