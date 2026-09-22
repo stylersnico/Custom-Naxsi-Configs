@@ -10,3 +10,9 @@
 # user-facing free text - same "wl:0" pattern used for WordPress's
 # free-form "content" field and Passbolt's gpg_auth fields.
 BasicRule wl:0 "mz:$URL:/graphql|$BODY_VAR:query";
+
+# GraphQL "variables" payload's "content" field is the page's actual
+# Markdown/HTML content being saved - free-form rich text full of
+# quotes, same false positive WordPress's "content" field has. Same
+# "wl:0" treatment, scoped to this endpoint.
+BasicRule wl:0 "mz:$URL:/graphql|$BODY_VAR:content";
