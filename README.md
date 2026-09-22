@@ -60,8 +60,21 @@ No community-maintained naxsi ruleset exists for any of these apps except WordPr
 ```bash
 mkdir -p /var/log/nginx/<vhost>
 chown www:www /var/log/nginx/<vhost>
+```
 
-# then always test before reloading
+Create all of them at once for every current vhost:
+```bash
+for d in abyssproject.net checkmk.nicolas-simond.ch files.nicolas-simond.ch \
+         gitea-mirror.nicolas-simond.ch gitea.nicolas-simond.ch grafana.nicolas-simond.ch \
+         ha-home.nicolas-simond.ch jelly.nicolas-simond.ch nicolas-simond.ch \
+         passbolt.nicolas-simond.ch umami.nicolas-simond.ch wiki.abyssproject.net; do
+  mkdir -p "/var/log/nginx/$d"
+  chown www:www "/var/log/nginx/$d"
+done
+```
+
+Then always test before reloading:
+```bash
 nginx -t && service nginx reload
 ```
 
