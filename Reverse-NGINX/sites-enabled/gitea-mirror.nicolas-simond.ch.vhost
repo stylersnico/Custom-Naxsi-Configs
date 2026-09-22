@@ -10,8 +10,21 @@ server {
         error_log /var/log/nginx/gitea-mirror.nicolas-simond.ch/error.log;
         NaxsiLogFile /var/log/nginx/gitea-mirror.nicolas-simond.ch/naxsi_error.log;
 
+        include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
+
             location / {
         client_max_body_size 512M;
+
+        # Naxsi WAF - core rules, standard thresholds. No community
+        # whitelist exists for gitea-mirror.
+        SecRulesEnabled;
+        CheckRule "$SQL >= 8" BLOCK;
+        CheckRule "$RFI >= 8" BLOCK;
+        CheckRule "$TRAVERSAL >= 4" BLOCK;
+        CheckRule "$EVADE >= 4" BLOCK;
+        CheckRule "$UPLOAD >= 8" BLOCK;
+        CheckRule "$XSS >= 8" BLOCK;
+
         proxy_pass http://192.168.1.10:4321;
         proxy_set_header Connection $http_connection;
         proxy_set_header Upgrade $http_upgrade;

@@ -30,9 +30,24 @@ server {
     error_log /var/log/nginx/ha-home.nicolas-simond.ch/error.log;
     NaxsiLogFile /var/log/nginx/ha-home.nicolas-simond.ch/naxsi_error.log;
 
+    include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
+
     proxy_buffering off;
 
         location / {
+            # Naxsi WAF - core rules, standard thresholds. No community
+            # whitelist exists for Home Assistant. Real risk area: the
+            # automation/template editor uses Jinja2 syntax
+            # ({{ states('x') | float }}) - heavy on braces/pipes/quotes,
+            # likely to trip $XSS/$SQL. Watch naxsi_error.log there.
+            SecRulesEnabled;
+            CheckRule "$SQL >= 8" BLOCK;
+            CheckRule "$RFI >= 8" BLOCK;
+            CheckRule "$TRAVERSAL >= 4" BLOCK;
+            CheckRule "$EVADE >= 4" BLOCK;
+            CheckRule "$UPLOAD >= 8" BLOCK;
+            CheckRule "$XSS >= 8" BLOCK;
+
             proxy_pass http://192.168.1.11:8123;
             proxy_set_header Host $host;
             proxy_http_version 1.1;

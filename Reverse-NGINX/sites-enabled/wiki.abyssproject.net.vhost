@@ -24,7 +24,22 @@ server {
         more_set_headers "Permissions-Policy : accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), clipboard-read=(), clipboard-write=(), display-capture=(), document-domain=(), encrypted-media=(), fullscreen=(), gamepad=(), geolocation=(), gyroscope=(), hid=(), idle-detection=(),  magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), speaker-selection=(), sync-xhr=(), usb=(), xr-spatial-tracking=()";
 
 
+    include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
+
     location / {
+        # Naxsi WAF - core rules, standard thresholds. No community
+        # whitelist exists for Wiki.js. Risk areas: the page editor
+        # (Markdown with code blocks/backticks/quotes) and the /graphql
+        # API used by the admin UI (JSON queries are brace/quote-heavy).
+        # Watch naxsi_error.log on both.
+        SecRulesEnabled;
+        CheckRule "$SQL >= 8" BLOCK;
+        CheckRule "$RFI >= 8" BLOCK;
+        CheckRule "$TRAVERSAL >= 4" BLOCK;
+        CheckRule "$EVADE >= 4" BLOCK;
+        CheckRule "$UPLOAD >= 8" BLOCK;
+        CheckRule "$XSS >= 8" BLOCK;
+
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_pass http://192.168.1.10:3000;

@@ -9,7 +9,21 @@ server {
     error_log /var/log/nginx/checkmk.nicolas-simond.ch/error.log;
     NaxsiLogFile /var/log/nginx/checkmk.nicolas-simond.ch/naxsi_error.log;
 
+    include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
+
     location / {
+        # Naxsi WAF - core rules, standard thresholds. No community
+        # whitelist exists for CheckMK. Watch for false positives when
+        # editing complex rule conditions (regex host/service patterns
+        # contain heavy punctuation).
+        SecRulesEnabled;
+        CheckRule "$SQL >= 8" BLOCK;
+        CheckRule "$RFI >= 8" BLOCK;
+        CheckRule "$TRAVERSAL >= 4" BLOCK;
+        CheckRule "$EVADE >= 4" BLOCK;
+        CheckRule "$UPLOAD >= 8" BLOCK;
+        CheckRule "$XSS >= 8" BLOCK;
+
         proxy_pass http://192.168.1.15:8080;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
