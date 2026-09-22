@@ -9,7 +9,13 @@ server {
 
         error_log /var/log/nginx/files.nicolas-simond.ch/error.log;
         NaxsiLogFile /var/log/nginx/files.nicolas-simond.ch/naxsi_error.log;
-        limit_conn conn_nextcloud 100;
+        # Higher than other vhosts: a single Nextcloud page load fans
+        # out into dozens of small per-app JS chunk requests (files,
+        # text, notifications...) on top of any concurrent desktop/
+        # mobile sync client traffic - 100 was already hit on plain
+        # page loads (error_log: "limiting connections by zone
+        # \"conn_nextcloud\"").
+        limit_conn conn_nextcloud 300;
 
         include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
 
