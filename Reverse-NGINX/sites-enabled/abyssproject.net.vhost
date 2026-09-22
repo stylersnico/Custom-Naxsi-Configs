@@ -71,6 +71,26 @@ server {
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
+        # WP core's own JS/CSS batch-loading endpoints, hit on every
+        # wp-admin page load. Their load[chunk_N] value is a WP-generated
+        # list of every installed plugin's script/style handles -
+        # unenumerable, changes as plugins are added/removed, and not
+        # attacker-reachable content worth scanning (wp-admin only,
+        # already behind auth). Naxsi bypassed entirely here rather than
+        # whitelisted field-by-field.
+        location ~ ^/wp-admin/load-(styles|scripts)\.php$ {
+            client_max_body_size 512M;
+            proxy_ssl_server_name on;
+            proxy_ssl_session_reuse on;
+            proxy_pass https://192.168.1.10:443;
+            proxy_set_header Connection $http_connection;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
         location / {
         client_max_body_size 512M;
 
