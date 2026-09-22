@@ -26,3 +26,14 @@ BasicRule wl:1310,1311 "mz:BODY|NAME";
 # them for BODY the same way wordpress.rules does for wp-cron.php's
 # similarly empty/non-standard POST body.
 BasicRule wl:13,15,16 "mz:BODY";
+
+# GPG challenge-response fields (login.json, verify.json:
+# data[gpg_auth][keyid], [user_token_result], [masked_token], etc.)
+# carry opaque encrypted/armored PGP data that can contain almost any
+# byte sequence (pipes, quotes, dashes...) and is never meaningfully
+# scannable for SQLi/XSS. Rather than chase every field/character
+# individually, whitelist the whole gpg_auth sub-object entirely -
+# same "wl:0 = whitelist everything for this zone" pattern
+# wordpress.rules uses for its free-form "content" field.
+BasicRule wl:0 "mz:$BODY_VAR_X:^data\[gpg_auth\]";
+BasicRule wl:0 "mz:$ARGS_VAR_X:^data\[gpg_auth\]";
