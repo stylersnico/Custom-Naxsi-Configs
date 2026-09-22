@@ -16,3 +16,7 @@ BasicRule wl:0 "mz:$URL:/graphql|$BODY_VAR:query";
 # quotes, same false positive WordPress's "content" field has. Same
 # "wl:0" treatment, scoped to this endpoint.
 BasicRule wl:0 "mz:$URL:/graphql|$BODY_VAR:content";
+
+# Page "title" field - free-form text, e.g. an apostrophe ("L'article")
+# trips the SQL/XSS single-quote rule (1013). Same wl:0 treatment.
+BasicRule wl:0 "mz:$URL:/graphql|$BODY_VAR:title";
