@@ -12,12 +12,14 @@ server {
             return 405;
         }
 
+        include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
+
         location / {
         client_max_body_size 1M;
 
         # Naxsi WAF - core rules only, standard thresholds.
+        # DeniedUrl is inherited from the shared definition in nginx.conf.
         SecRulesEnabled;
-        DeniedUrl "/naxsi_denied";
         CheckRule "$SQL >= 8" BLOCK;
         CheckRule "$RFI >= 8" BLOCK;
         CheckRule "$TRAVERSAL >= 4" BLOCK;
@@ -34,9 +36,5 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    location /naxsi_denied {
-        return 403;
     }
 }
