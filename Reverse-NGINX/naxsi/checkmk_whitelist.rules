@@ -29,3 +29,5 @@ BasicRule wl:0 "mz:$ARGS_VAR:context";
 BasicRule wl:0 "mz:$BODY_VAR:context";
 BasicRule wl:0 "mz:$BODY_VAR:content";
 BasicRule wl:0 "mz:$BODY_VAR:text";
+BasicRule wl:0 "mz:$BODY_VAR:general_settings";
+BasicRule wl:0 "mz:$BODY_VAR:url";
