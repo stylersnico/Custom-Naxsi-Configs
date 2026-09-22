@@ -14,6 +14,9 @@ server {
         ssl_certificate /etc/letsencrypt/live/nicolas-simond.ch/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/nicolas-simond.ch/privkey.pem;
 
+    error_log /var/log/nginx/gitea.nicolas-simond.ch/error.log;
+    NaxsiLogFile /var/log/nginx/gitea.nicolas-simond.ch/naxsi_error.log;
+
     if ($block_bot) {
         return 403;
     }

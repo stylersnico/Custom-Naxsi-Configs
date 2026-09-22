@@ -5,6 +5,9 @@ server {
         ssl_certificate /etc/letsencrypt/live/abyssproject.net/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/abyssproject.net/privkey.pem;
 
+        error_log /var/log/nginx/abyssproject.net/error.log;
+        NaxsiLogFile /var/log/nginx/abyssproject.net/naxsi_error.log;
+
         # wordpress_block.rules (MainRule) is loaded globally in nginx.conf
         # (MainRule is only valid at http level). CheckRule "$ATTACK/$UWA
         # >= 8" BLOCK; below is what actually enforces it for this vhost.

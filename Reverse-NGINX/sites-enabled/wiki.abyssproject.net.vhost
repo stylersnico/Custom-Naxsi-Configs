@@ -6,8 +6,8 @@ server {
 
         server_name wiki.abyssproject.net;
 
-        error_log /var/log/nginx/wiki.abyssproject.net.errorlog;
-        access_log /var/log/nginx/wiki.abyssproject.net.log;
+        error_log /var/log/nginx/wiki.abyssproject.net/error.log;
+        NaxsiLogFile /var/log/nginx/wiki.abyssproject.net/naxsi_error.log;
 
         #Common headers for security
         more_set_headers "Content-Security-Policy : default-src https: data: 'unsafe-inline' 'unsafe-eval' always";

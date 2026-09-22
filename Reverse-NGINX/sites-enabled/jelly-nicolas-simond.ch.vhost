@@ -5,6 +5,8 @@ server {
   server_name jelly.nicolas-simond.ch;
         ssl_certificate /etc/letsencrypt/live/nicolas-simond.ch/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/nicolas-simond.ch/privkey.pem;
+  error_log /var/log/nginx/jelly.nicolas-simond.ch/error.log;
+  NaxsiLogFile /var/log/nginx/jelly.nicolas-simond.ch/naxsi_error.log;
   client_max_body_size 40M;
   server_tokens off;
 

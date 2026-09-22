@@ -6,6 +6,9 @@ server {
     ssl_certificate /etc/letsencrypt/live/nicolas-simond.ch/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/nicolas-simond.ch/privkey.pem;
 
+    error_log /var/log/nginx/checkmk.nicolas-simond.ch/error.log;
+    NaxsiLogFile /var/log/nginx/checkmk.nicolas-simond.ch/naxsi_error.log;
+
     location / {
         proxy_pass http://192.168.1.15:8080;
         proxy_http_version 1.1;

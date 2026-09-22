@@ -8,8 +8,8 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/nicolas-simond.ch/privkey.pem;
 
     # Logging
-    access_log /var/log/nginx/umami-access.log combined;
-    error_log /var/log/nginx/umami-error.log;
+    error_log /var/log/nginx/umami.nicolas-simond.ch/error.log;
+    NaxsiLogFile /var/log/nginx/umami.nicolas-simond.ch/naxsi_error.log;
 
     # Proxy settings
     location / {

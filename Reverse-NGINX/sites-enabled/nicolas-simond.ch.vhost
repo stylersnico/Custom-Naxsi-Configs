@@ -7,6 +7,9 @@ server {
         ssl_certificate /etc/letsencrypt/live/nicolas-simond.ch/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/nicolas-simond.ch/privkey.pem;
 
+        error_log /var/log/nginx/nicolas-simond.ch/error.log;
+        NaxsiLogFile /var/log/nginx/nicolas-simond.ch/naxsi_error.log;
+
         # Static HTML site: no forms, no uploads - keep methods minimal.
         if ($request_method !~ ^(GET|HEAD)$) {
             return 405;
