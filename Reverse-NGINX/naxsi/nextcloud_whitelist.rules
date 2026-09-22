@@ -1,0 +1,15 @@
+# Nextcloud naxsi whitelist - hand-written, NOT a community-maintained
+# ruleset (none exists for Nextcloud, unlike wordpress_whitelist.rules).
+# Scoped narrowly to fix confirmed false positives from real traffic in
+# naxsi_error.log; only extend when a new false positive is confirmed
+# there, not speculatively.
+
+# Nextcloud's session/CSRF cookies are heavily percent-encoded
+# (base64url-ish tokens), tripping the "double encoding" rule (1315)
+# in the Cookie header on nearly every request - it was blocking /login,
+# /apps/files/, even /favicon.ico. Cookie content here is server-set,
+# trusted session data, not user-controlled attacker input, so this is
+# the exact same class of false positive the official wordpress.rules
+# whitelist already accepts for its own cookies - reuse that same rule
+# ID list for the Cookie header.
+BasicRule wl:1000,1001,1005,1007,1010,1011,1013,1100,1101,1200,1308,1309,1310,1311,1315 "mz:$HEADERS_VAR:cookie";
