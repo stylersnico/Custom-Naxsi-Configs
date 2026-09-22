@@ -14,6 +14,45 @@ server {
 
     include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
 
+    # Umami is meant to be called cross-origin from any tracked site's
+    # own domain, so this write-only, credential-less beacon endpoint
+    # allows any origin. The browser's OPTIONS preflight is answered
+    # directly here (204, no naxsi/proxy needed) rather than relying on
+    # the backend to handle it - it was returning 405 for OPTIONS.
+    location = /api/send {
+        add_header Access-Control-Allow-Origin "*" always;
+
+        if ($request_method = OPTIONS) {
+            add_header Access-Control-Allow-Origin "*" always;
+            add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always;
+            add_header Access-Control-Allow-Headers "Content-Type" always;
+            add_header Access-Control-Max-Age 86400 always;
+            return 204;
+        }
+
+        SecRulesEnabled;
+        CheckRule "$SQL >= 8" BLOCK;
+        CheckRule "$RFI >= 8" BLOCK;
+        CheckRule "$TRAVERSAL >= 4" BLOCK;
+        CheckRule "$EVADE >= 4" BLOCK;
+        CheckRule "$UPLOAD >= 8" BLOCK;
+        CheckRule "$XSS >= 8" BLOCK;
+        include /usr/local/etc/nginx/naxsi/umami_whitelist.rules;
+
+        proxy_pass http://192.168.1.10:3421;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+        proxy_buffering off;
+    }
+
     # Proxy settings
     location / {
         # Naxsi WAF - core rules, standard thresholds. No community
