@@ -28,9 +28,15 @@
     margin: 0 0 12px;
   }
   p {
-    margin: 0;
+    margin: 0 0 12px;
     color: #a3a3a3;
     line-height: 1.5;
+  }
+  p:last-child {
+    margin-bottom: 0;
+  }
+  a {
+    color: #e6e6e6;
   }
 </style>
 </head>
@@ -38,6 +44,10 @@
   <div class="card">
     <h1>Request blocked</h1>
     <p>This request was blocked by our security filters. If you believe this is a mistake, please contact the site administrator.</p>
+    <p>
+      <a href="mailto:me@nicolas-simond.ch">me@nicolas-simond.ch</a><br>
+      GPG key: <a href="https://www.nicolas-simond.ch/publickey.me@nicolas-simond.ch.asc">publickey.me@nicolas-simond.ch.asc</a>
+    </p>
   </div>
 </body>
 </html>
