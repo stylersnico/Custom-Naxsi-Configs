@@ -1,0 +1,22 @@
+# Local additions on top of the upstream wordpress_whitelist.rules
+# (kept unmodified for easy re-sync). Scoped narrowly to fix confirmed
+# false positives from real traffic in naxsi_error.log; only extend
+# when a new false positive is confirmed there, not speculatively.
+
+# "select2" (a common JS UI library) contains the SQL keyword "select",
+# tripping the core SQL-keywords rule (id 1000) on its own asset URL.
+# Upstream wordpress.rules already whitelists this for WooCommerce,
+# Yoast SEO and WPML's bundled select2 assets - add the same fix for
+# the wp-user-avatar plugin.
+BasicRule wl:1000 "mz:$URL:/wp-content/plugins/wp-user-avatar/assets/select2/select2.min.js|URL";
+BasicRule wl:1000 "mz:$URL:/wp-content/plugins/wp-user-avatar/assets/select2/select2.min.css|URL";
+
+# Third-party plugin meta boxes on /wp-admin/post.php (Gutenberg/classic
+# editor "Save"/"Publish") submit their own custom fields using bracket
+# notation (e.g. typology[display_settings]), just like WordPress core
+# fields such as post_category[]/tax_input[post_tag] that upstream
+# already whitelists by exact name. Plugin field names can't be
+# enumerated in advance, so whitelist brackets in BODY param names
+# generically - same "mz:BODY|NAME" pattern confirmed reliable on
+# Passbolt (unlike the $BODY_VAR_X regex-prefix variant, which wasn't).
+BasicRule wl:1310,1311 "mz:BODY|NAME";

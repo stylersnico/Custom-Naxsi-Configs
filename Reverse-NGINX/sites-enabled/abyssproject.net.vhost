@@ -35,6 +35,7 @@ server {
             CheckRule "$XSS >= 8" BLOCK;
             CheckRule "$ATTACK >= 8" BLOCK;
             include /usr/local/etc/nginx/naxsi/wordpress_whitelist.rules;
+            include /usr/local/etc/nginx/naxsi/wordpress_extra_whitelist.rules;
 
             client_max_body_size 512M;
             proxy_ssl_server_name on;
@@ -84,6 +85,7 @@ server {
         CheckRule "$ATTACK >= 8" BLOCK;
         CheckRule "$UWA >= 8" BLOCK;
         include /usr/local/etc/nginx/naxsi/wordpress_whitelist.rules;
+        include /usr/local/etc/nginx/naxsi/wordpress_extra_whitelist.rules;
 
                 proxy_ssl_server_name on;
         proxy_ssl_session_reuse on;
