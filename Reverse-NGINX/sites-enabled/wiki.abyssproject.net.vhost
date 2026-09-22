@@ -27,12 +27,25 @@ server {
 
     include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
 
+    # /graphql is Wiki.js's whole app API (query/content/title/... every
+    # field is free-form JSON, three fields already had to be whitelisted
+    # entirely). Mutations require auth, so bypass naxsi here entirely
+    # instead of continuing to whitelist field-by-field.
+    location = /graphql {
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_pass http://192.168.1.10:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_next_upstream error timeout http_502 http_503 http_504;
+    }
+
     location / {
         # Naxsi WAF - core rules, standard thresholds. No community
-        # whitelist exists for Wiki.js. Risk areas: the page editor
-        # (Markdown with code blocks/backticks/quotes) and the /graphql
-        # API used by the admin UI (JSON queries are brace/quote-heavy).
-        # Watch naxsi_error.log on both.
+        # whitelist exists for Wiki.js. Risk area: the page editor
+        # (Markdown with code blocks/backticks/quotes). /graphql is
+        # handled separately above (naxsi bypassed there entirely).
         SecRulesEnabled;
         CheckRule "$SQL >= 8" BLOCK;
         CheckRule "$RFI >= 8" BLOCK;
@@ -40,7 +53,6 @@ server {
         CheckRule "$EVADE >= 4" BLOCK;
         CheckRule "$UPLOAD >= 8" BLOCK;
         CheckRule "$XSS >= 8" BLOCK;
-        include /usr/local/etc/nginx/naxsi/wikijs_whitelist.rules;
 
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
