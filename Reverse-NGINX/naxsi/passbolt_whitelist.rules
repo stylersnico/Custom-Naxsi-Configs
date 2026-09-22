@@ -13,11 +13,16 @@
 # submitted values are still fully scanned.
 BasicRule wl:1310,1311 "mz:ARGS|NAME";
 
-# Some API calls (e.g. POST /auth/logout.json) send an empty or
-# non-JSON body while still setting Content-Type: application/json.
-# naxsi's JSON body parser then fails with its internal "invalid JSON"
-# (id 15) / "empty POST" (id 16) status and blocks unconditionally -
-# these aren't attack-pattern scores, just parser-status codes, so
-# whitelist them for BODY the same way wordpress.rules does for
-# wp-cron.php's similarly empty/non-standard POST body.
-BasicRule wl:15,16 "mz:BODY";
+# Same bracket notation also shows up in BODY param names, e.g.
+# data[gpg_auth][keyid] on /auth/verify.json.
+BasicRule wl:1310,1311 "mz:BODY|NAME";
+
+# Some API calls (e.g. POST /auth/logout.json, /auth/verify.json) send
+# an empty, non-JSON, or non-standard-format body while still setting
+# Content-Type: application/json. naxsi's body parser then fails with
+# one of its internal parser-status codes - "invalid POST format"
+# (id 13), "invalid JSON" (id 15), "empty POST" (id 16) - and blocks
+# unconditionally. These aren't attack-pattern scores, so whitelist
+# them for BODY the same way wordpress.rules does for wp-cron.php's
+# similarly empty/non-standard POST body.
+BasicRule wl:13,15,16 "mz:BODY";
