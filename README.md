@@ -1,6 +1,6 @@
-# Infrastructure config
+# Custom Naxsi Configs
 
-My own infrastructure configuration.
+My own Naxsi WAF configurations for my self-hosted infrastructure.
 
 ## Reverse-NGINX
 
