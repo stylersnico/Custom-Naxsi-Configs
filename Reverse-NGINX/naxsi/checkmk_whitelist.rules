@@ -2,6 +2,11 @@
 # ruleset (none exists for CheckMK). Scoped narrowly to fix confirmed
 # false positives from real traffic in naxsi_error.log; only extend
 # when a new false positive is confirmed there, not speculatively.
+#
+# Naxsi only runs on the pre-auth login/2FA flow (login.py,
+# user_login_two_factor.py) - see checkmk.nicolas-simond.ch.vhost.
+# Everything past login is bypassed entirely, so these are the only
+# fixes still relevant.
 
 # Login password field: a password containing a single quote (or any
 # other special character) blocked login entirely (rule 1013). WAF
@@ -18,32 +23,3 @@ BasicRule wl:0 "mz:$BODY_VAR:_password";
 # positive already fixed for Nextcloud - reuse the same cookie-header
 # whitelist rule ID list wordpress.rules uses for its own cookies.
 BasicRule wl:1000,1001,1005,1007,1010,1011,1013,1100,1101,1200,1308,1309,1310,1311,1315 "mz:$HEADERS_VAR:cookie";
-
-# The dashboard/widget subsystem (widget_*.py, sidebar_snapin.py, the
-# dashboard API) is no longer naxsi-scanned at all - see the dedicated
-# "location ~" bypass in checkmk.nicolas-simond.ch.vhost. It used to
-# need six different fields whitelisted entirely (names, context,
-# content, text, general_settings, url), same reasoning as Wiki.js's
-# /graphql bypass.
-
-# view.py's "selection" param name (row-selection state) contains the
-# SQL keyword "select" as a substring - a keyword-collision false
-# positive, not related to its actual content. Narrow fix, view.py
-# itself stays fully naxsi-scanned otherwise.
-BasicRule wl:1000 "mz:ARGS|NAME";
-BasicRule wl:1000 "mz:BODY|NAME";
-
-# ajax_vs_autocomplete.py's "request" field passes a serialized
-# valuespec/regex autocompletion query - quote/paren-heavy structured
-# data (score 128 observed), not user free text. Scoped to this one
-# endpoint rather than whitelisting the generic name "request" globally.
-BasicRule wl:0 "mz:$URL:/cmk/check_mk/ajax_vs_autocomplete.py|$BODY_VAR:request";
-
-# wato.py (the main config UI: rules, hosts, services) passes "item"
-# and "service" as query params - these are infrastructure-derived
-# identifiers (mount paths, interface names, service descriptions,
-# sometimes SNMP OIDs) that can legitimately contain "=" and other
-# special characters, not visitor-facing free text. Whitelisted the
-# equal-sign rule (1009) for both.
-BasicRule wl:1009 "mz:$ARGS_VAR:item";
-BasicRule wl:1009 "mz:$ARGS_VAR:service";
