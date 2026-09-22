@@ -17,12 +17,13 @@ server {
         # unauthenticated attack surface); everything else requires a
         # session already and is bypassed preemptively to avoid the
         # kind of repeated whack-a-mole false positives seen on CheckMK.
-        # Path guessed as "/login" + "/api/auth/" (common Next.js/Bun
-        # app convention) - not log-confirmed. If the real login page
-        # turns out to be elsewhere, this needs adjusting.
+        # Path confirmed via naxsi_error.log ("Better Auth" library
+        # convention: /login, /api/auth/get-session, /api/auth/list-
+        # accounts, ...). No limit_req zone=login here: the frontend
+        # polls get-session/list-accounts on every page load/navigation
+        # (not credential submission), which tripped the brute-force
+        # rate limit on normal usage - naxsi still scans this path.
         location ~ ^/(login|api/auth/) {
-            limit_req zone=login burst=5 nodelay;
-
             SecRulesEnabled;
             CheckRule "$SQL >= 8" BLOCK;
             CheckRule "$RFI >= 8" BLOCK;
