@@ -49,18 +49,12 @@ server {
         location / {
         client_max_body_size 512M;
 
-        # Naxsi WAF - core rules, standard thresholds, applied to the
-        # whole app including its JSON API. No community-validated
-        # Grafana whitelist exists - watch for false positives on
-        # dashboard JSON payloads / alert rule expressions.
-        SecRulesEnabled;
-        CheckRule "$SQL >= 8" BLOCK;
-        CheckRule "$RFI >= 8" BLOCK;
-        CheckRule "$TRAVERSAL >= 4" BLOCK;
-        CheckRule "$EVADE >= 4" BLOCK;
-        CheckRule "$UPLOAD >= 8" BLOCK;
-        CheckRule "$XSS >= 8" BLOCK;
-        include /usr/local/etc/nginx/naxsi/grafana_whitelist.rules;
+        # Naxsi only runs on /login above (the one real unauthenticated
+        # attack surface). Everything else requires a valid session and
+        # Grafana's dashboard JSON / PromQL / alert expressions are
+        # exactly the kind of punctuation-heavy structured data that
+        # caused repeated whack-a-mole false positives on CheckMK -
+        # bypassed here preemptively instead.
 
         proxy_pass http://192.168.1.250:3000;
         proxy_set_header Connection $http_connection;
