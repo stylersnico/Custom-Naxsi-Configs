@@ -1,0 +1,14 @@
+# Passbolt naxsi whitelist - hand-written, NOT a community-maintained
+# ruleset (none exists for Passbolt, unlike wordpress_whitelist.rules).
+# Scoped narrowly to fix confirmed false positives from real traffic in
+# naxsi_error.log; only extend when a new false positive is confirmed
+# there, not speculatively.
+
+# Passbolt's API (CakePHP) uses bracket notation for nested/dynamic
+# query param names: contain[role], filter[has-users],
+# contain[Permission][User], etc. Keys are arbitrary and can't be
+# enumerated like WordPress's fixed param names, so each "[" or "]" in
+# a param NAME was scoring $XSS 4+4=8 (rules 1310/1311) and blocking
+# almost every API call. Whitelisted in the NAME zone only - actual
+# submitted values are still fully scanned.
+BasicRule wl:1310,1311 "mz:ARGS|NAME";
