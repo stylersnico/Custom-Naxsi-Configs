@@ -11,3 +11,9 @@
 # text, not something to enumerate - same "wl:0" pattern wordpress.rules
 # uses for its own free-form "content" field.
 BasicRule wl:0 "mz:$BODY_VAR:title";
+
+# Same endpoint's "url" field is the tracked page's own full URL
+# (e.g. "https://example.com/path") - the "https://"/"http://" scheme
+# trips the RFI rules (1100/1101), same false positive wordpress.rules
+# already whitelists for WordPress's own "url"/"referredby" fields.
+BasicRule wl:1100,1101 "mz:$BODY_VAR:url";
