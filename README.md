@@ -67,6 +67,8 @@ nginx -t && service nginx reload
 
 --------
 
+## Wazuh integration
+See: https://github.com/stylersnico/Naxsi-Wazuh-Integration/
 ## Known limitations
 
 * Nextcloud's own admin security panel may still warn about HSTS - that check hits a separate local web server on the Nextcloud host itself, outside this repo.
