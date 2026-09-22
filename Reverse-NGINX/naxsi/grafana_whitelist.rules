@@ -1,0 +1,10 @@
+# Grafana naxsi whitelist - hand-written, NOT a community-maintained
+# ruleset (none exists for Grafana). Scoped narrowly to fix confirmed
+# false positives from real traffic in naxsi_error.log; only extend
+# when a new false positive is confirmed there, not speculatively.
+
+# Preventive (not log-confirmed): a WAF should never content-scan a
+# password field - Grafana's login API (POST /login) uses a JSON
+# "password" field. Same reasoning as the CheckMK/WordPress/Nextcloud/
+# Umami password-field fixes.
+BasicRule wl:0 "mz:$BODY_VAR:password";

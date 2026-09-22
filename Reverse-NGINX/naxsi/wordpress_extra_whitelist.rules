@@ -38,3 +38,11 @@ BasicRule wl:1310,1311 "mz:ARGS|NAME";
 # URL zone. Upstream wordpress.rules already whitelists this plugin's
 # .css asset but not its .js one - close that gap.
 BasicRule wl:1000 "mz:$URL:/wp-includes/js/imgareaselect/jquery.imgareaselect.min.js|URL";
+
+# Preventive (not log-confirmed): a WAF should never content-scan a
+# password field - the backend handles arbitrary characters safely via
+# hashing regardless, and scanning only risks locking out users whose
+# password contains a quote/special character (confirmed happening on
+# CheckMK's login with the same rule class). Upstream wordpress.rules
+# only whitelists rule 1011 (close-paren) for "pwd" - widen to wl:0.
+BasicRule wl:0 "mz:$BODY_VAR:pwd";

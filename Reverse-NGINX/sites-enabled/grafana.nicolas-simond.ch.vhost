@@ -33,6 +33,7 @@ server {
         CheckRule "$EVADE >= 4" BLOCK;
         CheckRule "$UPLOAD >= 8" BLOCK;
         CheckRule "$XSS >= 8" BLOCK;
+        include /usr/local/etc/nginx/naxsi/grafana_whitelist.rules;
 
         client_max_body_size 512M;
         proxy_pass http://192.168.1.250:3000;
@@ -59,6 +60,7 @@ server {
         CheckRule "$EVADE >= 4" BLOCK;
         CheckRule "$UPLOAD >= 8" BLOCK;
         CheckRule "$XSS >= 8" BLOCK;
+        include /usr/local/etc/nginx/naxsi/grafana_whitelist.rules;
 
         proxy_pass http://192.168.1.250:3000;
         proxy_set_header Connection $http_connection;

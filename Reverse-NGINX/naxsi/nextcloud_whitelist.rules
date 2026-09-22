@@ -23,3 +23,8 @@ BasicRule wl:1000,1001,1005,1007,1010,1011,1013,1100,1101,1200,1308,1309,1310,13
 # BODY rather than route-by-route, since OCS has too many endpoints to
 # enumerate individually.
 BasicRule wl:11 "mz:BODY";
+
+# Preventive (not log-confirmed): a WAF should never content-scan a
+# password field - Nextcloud's login form field is "password". Same
+# reasoning as the CheckMK/WordPress password-field fixes.
+BasicRule wl:0 "mz:$BODY_VAR:password";

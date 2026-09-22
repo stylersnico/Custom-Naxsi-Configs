@@ -17,3 +17,9 @@ BasicRule wl:0 "mz:$BODY_VAR:title";
 # trips the RFI rules (1100/1101), same false positive wordpress.rules
 # already whitelists for WordPress's own "url"/"referredby" fields.
 BasicRule wl:1100,1101 "mz:$BODY_VAR:url";
+
+# Preventive (not log-confirmed): a WAF should never content-scan a
+# password field - Umami's admin login (separate from /api/send) uses
+# a JSON "password" field. Same reasoning as the CheckMK/WordPress/
+# Nextcloud password-field fixes.
+BasicRule wl:0 "mz:$BODY_VAR:password";

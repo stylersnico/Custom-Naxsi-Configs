@@ -64,6 +64,7 @@ location ~ ^/api/ {
         CheckRule "$EVADE >= 4" BLOCK;
         CheckRule "$UPLOAD >= 8" BLOCK;
         CheckRule "$XSS >= 8" BLOCK;
+        include /usr/local/etc/nginx/naxsi/gitea_whitelist.rules;
 
         proxy_pass http://192.168.1.10:3333;
         proxy_set_header Connection $http_connection;
