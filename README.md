@@ -2,9 +2,7 @@
 
 My own Naxsi WAF configurations for my self-hosted infrastructure.
 
-## Reverse-NGINX
-
-The goal of this part of the repository is to provide a hardened reverse-proxy in front of every self-hosted app I run, with support for:
+The goal of this repository is to provide a hardened reverse-proxy in front of every self-hosted app I run, with support for:
 
 * Naxsi WAF (core rules + per-app hand-written/community whitelists)
 * Per-vhost connection & request rate limiting
@@ -60,17 +58,6 @@ No community-maintained naxsi ruleset exists for any of these apps except WordPr
 ```bash
 mkdir -p /var/log/nginx/<vhost>
 chown www:www /var/log/nginx/<vhost>
-```
-
-Create all of them at once for every current vhost:
-```bash
-for d in abyssproject.net checkmk.nicolas-simond.ch files.nicolas-simond.ch \
-         gitea-mirror.nicolas-simond.ch gitea.nicolas-simond.ch grafana.nicolas-simond.ch \
-         ha-home.nicolas-simond.ch jelly.nicolas-simond.ch nicolas-simond.ch \
-         passbolt.nicolas-simond.ch umami.nicolas-simond.ch wiki.abyssproject.net; do
-  mkdir -p "/var/log/nginx/$d"
-  chown www:www "/var/log/nginx/$d"
-done
 ```
 
 Then always test before reloading:
