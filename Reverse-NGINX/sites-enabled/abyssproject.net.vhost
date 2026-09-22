@@ -5,6 +5,12 @@ server {
         ssl_certificate /etc/letsencrypt/live/abyssproject.net/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/abyssproject.net/privkey.pem;
 
+        # MainRule definitions (naxsi's WordPress attack blocklist) are only
+        # valid in http/server context, not inside a location - declare once
+        # here. CheckRule "$ATTACK/$UWA >= 8" BLOCK; in each location below
+        # decides where the resulting score is actually enforced.
+        include /usr/local/etc/nginx/naxsi/wordpress_block.rules;
+
         # Block direct access to sensitive files regardless of backend config.
         location ~* /(wp-config\.php|xmlrpc\.php~|readme\.html|license\.txt|wp-config-sample\.php)$ {
             deny all;
@@ -27,7 +33,6 @@ server {
             CheckRule "$XSS >= 8" BLOCK;
             CheckRule "$ATTACK >= 8" BLOCK;
             include /usr/local/etc/nginx/naxsi/wordpress_whitelist.rules;
-            include /usr/local/etc/nginx/naxsi/wordpress_block.rules;
 
             client_max_body_size 512M;
             proxy_ssl_server_name on;
@@ -51,7 +56,6 @@ server {
             SecRulesEnabled;
             DeniedUrl "/naxsi_denied";
             CheckRule "$ATTACK >= 8" BLOCK;
-            include /usr/local/etc/nginx/naxsi/wordpress_block.rules;
 
             client_max_body_size 512M;
             proxy_ssl_server_name on;
@@ -80,7 +84,6 @@ server {
         CheckRule "$ATTACK >= 8" BLOCK;
         CheckRule "$UWA >= 8" BLOCK;
         include /usr/local/etc/nginx/naxsi/wordpress_whitelist.rules;
-        include /usr/local/etc/nginx/naxsi/wordpress_block.rules;
 
                 proxy_ssl_server_name on;
         proxy_ssl_session_reuse on;
