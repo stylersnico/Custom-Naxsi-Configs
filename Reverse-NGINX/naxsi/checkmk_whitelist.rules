@@ -25,3 +25,16 @@ BasicRule wl:1000,1001,1005,1007,1010,1011,1013,1100,1101,1200,1308,1309,1310,13
 # need six different fields whitelisted entirely (names, context,
 # content, text, general_settings, url), same reasoning as Wiki.js's
 # /graphql bypass.
+
+# view.py's "selection" param name (row-selection state) contains the
+# SQL keyword "select" as a substring - a keyword-collision false
+# positive, not related to its actual content. Narrow fix, view.py
+# itself stays fully naxsi-scanned otherwise.
+BasicRule wl:1000 "mz:ARGS|NAME";
+BasicRule wl:1000 "mz:BODY|NAME";
+
+# ajax_vs_autocomplete.py's "request" field passes a serialized
+# valuespec/regex autocompletion query - quote/paren-heavy structured
+# data (score 128 observed), not user free text. Scoped to this one
+# endpoint rather than whitelisting the generic name "request" globally.
+BasicRule wl:0 "mz:$URL:/cmk/check_mk/ajax_vs_autocomplete.py|$BODY_VAR:request";
