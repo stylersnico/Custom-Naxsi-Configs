@@ -9,7 +9,7 @@ server {
 
         error_log /var/log/nginx/gitea-mirror.nicolas-simond.ch/error.log;
         NaxsiLogFile /var/log/nginx/gitea-mirror.nicolas-simond.ch/naxsi_error.log;
-        limit_conn conn_gitea_mirror 100;
+        limit_conn conn_gitea_mirror 500;
 
         include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
 

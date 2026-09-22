@@ -10,7 +10,7 @@ server {
     # Logging
     error_log /var/log/nginx/umami.nicolas-simond.ch/error.log;
     NaxsiLogFile /var/log/nginx/umami.nicolas-simond.ch/naxsi_error.log;
-    limit_conn conn_umami 100;
+    limit_conn conn_umami 500;
 
     include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
 

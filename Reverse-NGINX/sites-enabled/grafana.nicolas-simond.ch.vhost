@@ -14,7 +14,7 @@ server {
 
     error_log /var/log/nginx/grafana.nicolas-simond.ch/error.log;
     NaxsiLogFile /var/log/nginx/grafana.nicolas-simond.ch/naxsi_error.log;
-    limit_conn conn_grafana 100;
+    limit_conn conn_grafana 500;
 
     if ($block_bot) {
         return 403;
@@ -23,7 +23,7 @@ server {
     include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
 
     location = /login {
-        limit_req zone=login burst=5 nodelay;
+        limit_req zone=login burst=20 nodelay;
 
         # Naxsi WAF - core rules, standard thresholds.
         SecRulesEnabled;

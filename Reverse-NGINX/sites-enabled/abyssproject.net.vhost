@@ -7,7 +7,7 @@ server {
 
         error_log /var/log/nginx/abyssproject.net/error.log;
         NaxsiLogFile /var/log/nginx/abyssproject.net/naxsi_error.log;
-        limit_conn conn_abyssproject_net 100;
+        limit_conn conn_abyssproject_net 500;
 
         # wordpress_block.rules (MainRule) is loaded globally in nginx.conf
         # (MainRule is only valid at http level). CheckRule "$ATTACK/$UWA
@@ -25,7 +25,7 @@ server {
 
         # Stricter rate limit on the two brute-force-prone entry points.
         location = /wp-login.php {
-            limit_req zone=login burst=5 nodelay;
+            limit_req zone=login burst=20 nodelay;
 
             SecRulesEnabled;
             CheckRule "$SQL >= 8" BLOCK;
@@ -51,7 +51,7 @@ server {
         }
 
         location = /xmlrpc.php {
-            limit_req zone=login burst=5 nodelay;
+            limit_req zone=login burst=20 nodelay;
 
             # XML-RPC bodies are legitimate XML (full of "<"/">"), which
             # trips the generic SQL/XSS/RFI/TRAVERSAL/EVADE/UPLOAD scoring

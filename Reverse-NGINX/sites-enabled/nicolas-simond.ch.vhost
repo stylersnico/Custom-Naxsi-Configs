@@ -9,7 +9,7 @@ server {
 
         error_log /var/log/nginx/nicolas-simond.ch/error.log;
         NaxsiLogFile /var/log/nginx/nicolas-simond.ch/naxsi_error.log;
-        limit_conn conn_nicolas_simond_ch 100;
+        limit_conn conn_nicolas_simond_ch 500;
 
         # Static HTML site: no forms, no uploads - keep methods minimal.
         if ($request_method !~ ^(GET|HEAD)$) {

@@ -10,7 +10,7 @@ server {
   # Higher than other vhosts: HLS/DASH segment streaming (especially
   # with multiple devices/transcodes) opens many more concurrent
   # short-lived requests than a typical web app.
-  limit_conn conn_jellyfin 150;
+  limit_conn conn_jellyfin 800;
   client_max_body_size 40M;
   server_tokens off;
 

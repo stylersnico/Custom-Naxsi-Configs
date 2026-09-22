@@ -29,7 +29,7 @@ server {
 
     error_log /var/log/nginx/ha-home.nicolas-simond.ch/error.log;
     NaxsiLogFile /var/log/nginx/ha-home.nicolas-simond.ch/naxsi_error.log;
-    limit_conn conn_ha 100;
+    limit_conn conn_ha 500;
 
     include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
 
@@ -44,7 +44,7 @@ server {
         # repeated whack-a-mole false positives on CheckMK, so bypassed
         # here preemptively instead of waiting for the same to happen.
         location ~ ^/auth/ {
-            limit_req zone=login burst=5 nodelay;
+            limit_req zone=login burst=20 nodelay;
 
             SecRulesEnabled;
             CheckRule "$SQL >= 8" BLOCK;

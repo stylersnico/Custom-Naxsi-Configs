@@ -15,7 +15,7 @@ server {
         # mobile sync client traffic - 100 was already hit on plain
         # page loads (error_log: "limiting connections by zone
         # \"conn_nextcloud\"").
-        limit_conn conn_nextcloud 300;
+        limit_conn conn_nextcloud 800;
 
         include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
 

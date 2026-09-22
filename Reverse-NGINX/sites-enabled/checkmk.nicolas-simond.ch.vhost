@@ -8,7 +8,7 @@ server {
 
     error_log /var/log/nginx/checkmk.nicolas-simond.ch/error.log;
     NaxsiLogFile /var/log/nginx/checkmk.nicolas-simond.ch/naxsi_error.log;
-    limit_conn conn_checkmk 100;
+    limit_conn conn_checkmk 500;
 
     include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
 
@@ -22,7 +22,7 @@ server {
     # else requires a valid session already, so naxsi is bypassed
     # entirely rather than continuing to whitelist field-by-field.
     location ~ ^/cmk/check_mk/(login\.py|user_login_two_factor\.py)$ {
-        limit_req zone=login burst=5 nodelay;
+        limit_req zone=login burst=20 nodelay;
 
         SecRulesEnabled;
         CheckRule "$SQL >= 8" BLOCK;
