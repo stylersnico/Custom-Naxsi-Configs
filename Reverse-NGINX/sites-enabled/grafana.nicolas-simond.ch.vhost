@@ -43,7 +43,18 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        more_set_headers "X-Frame-Options SAMEORIGIN always";
+
+        # Embeddable in a Home Assistant dashboard (cross-origin iframe).
+        # The malformed "X-Frame-Options SAMEORIGIN always" (missing the
+        # ":" - the whole string became an invalid header value browsers
+        # ignore) is removed, letting the global, correctly-formed
+        # "X-Frame-Options: SAMEORIGIN" apply. Modern browsers prefer
+        # CSP frame-ancestors over X-Frame-Options when both are
+        # present, so this add_header (kept separate from the global
+        # more_set_headers CSP - multiple CSP headers intersect rather
+        # than replace each other) explicitly allows framing from
+        # ha-home.nicolas-simond.ch without opening it up to anyone else.
+        add_header Content-Security-Policy "frame-ancestors 'self' https://ha-home.nicolas-simond.ch;" always;
     }
 
         location / {
@@ -63,6 +74,8 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        more_set_headers "X-Frame-Options SAMEORIGIN always";
+
+        # See the same fix's comment on /login above.
+        add_header Content-Security-Policy "frame-ancestors 'self' https://ha-home.nicolas-simond.ch;" always;
     }
 }
