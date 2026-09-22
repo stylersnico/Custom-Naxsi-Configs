@@ -38,3 +38,12 @@ BasicRule wl:1000 "mz:BODY|NAME";
 # data (score 128 observed), not user free text. Scoped to this one
 # endpoint rather than whitelisting the generic name "request" globally.
 BasicRule wl:0 "mz:$URL:/cmk/check_mk/ajax_vs_autocomplete.py|$BODY_VAR:request";
+
+# wato.py (the main config UI: rules, hosts, services) passes "item"
+# and "service" as query params - these are infrastructure-derived
+# identifiers (mount paths, interface names, service descriptions,
+# sometimes SNMP OIDs) that can legitimately contain "=" and other
+# special characters, not visitor-facing free text. Whitelisted the
+# equal-sign rule (1009) for both.
+BasicRule wl:1009 "mz:$ARGS_VAR:item";
+BasicRule wl:1009 "mz:$ARGS_VAR:service";
