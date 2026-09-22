@@ -22,21 +22,20 @@ server {
     include /usr/local/etc/nginx/naxsi/naxsi_denied.conf;
 
     location / {
-        # Naxsi WAF - core rules, standard thresholds, applied to the
-        # whole app including its JSON API. No community-validated
-        # Passbolt whitelist exists. Passbolt exchanges armored PGP
-        # blobs (base64 + "-----BEGIN/END..." + checksum "=" lines) as
-        # JSON string values - test encrypt/decrypt/share flows
-        # thoroughly before trusting this in production; raise
-        # thresholds or add targeted whitelists if false positives show.
-        SecRulesEnabled;
-        CheckRule "$SQL >= 8" BLOCK;
-        CheckRule "$RFI >= 8" BLOCK;
-        CheckRule "$TRAVERSAL >= 4" BLOCK;
-        CheckRule "$EVADE >= 4" BLOCK;
-        CheckRule "$UPLOAD >= 8" BLOCK;
-        CheckRule "$XSS >= 8" BLOCK;
-        include /usr/local/etc/nginx/naxsi/passbolt_whitelist.rules;
+        # Naxsi disabled for now - too many false positives on the
+        # gpg_auth challenge-response fields to chase reliably (see
+        # naxsi/passbolt_whitelist.rules and git history for context).
+        # Revisit later; whitelist file kept around for when this is
+        # picked back up, just not included/active here.
+        #
+        # SecRulesEnabled;
+        # CheckRule "$SQL >= 8" BLOCK;
+        # CheckRule "$RFI >= 8" BLOCK;
+        # CheckRule "$TRAVERSAL >= 4" BLOCK;
+        # CheckRule "$EVADE >= 4" BLOCK;
+        # CheckRule "$UPLOAD >= 8" BLOCK;
+        # CheckRule "$XSS >= 8" BLOCK;
+        # include /usr/local/etc/nginx/naxsi/passbolt_whitelist.rules;
 
         proxy_pass https://192.168.1.18;  # Or https://passbolt-internal:443 if backend has SSL
         proxy_ssl_verify off;
