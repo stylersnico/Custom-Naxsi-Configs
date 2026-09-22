@@ -38,8 +38,6 @@ location ~ ^/.*/(info/refs|git-upload-pack|git-receive-pack)$ {
 # and API payloads (diffs, code, LFS pointers) are prone to false
 # positives against generic core rules - left unscanned for now.
 location ~ ^/api/ {
-        allow 192.168.1.0/24;
-#       deny all;
         limit_req zone=gitea burst=150 nodelay;
         client_max_body_size 512M;
         proxy_pass http://192.168.1.10:3333;
@@ -52,8 +50,6 @@ location ~ ^/api/ {
 }
 
         location / {
-        allow 192.168.1.0/24;
-#       deny all;
         limit_req zone=gitea burst=150 nodelay;
         client_max_body_size 512M;
 
