@@ -8,3 +8,8 @@
 # password field - HA's login flow API uses a JSON "password" field.
 # Same reasoning as the other password-field fixes.
 BasicRule wl:0 "mz:$BODY_VAR:password";
+
+# Preventive: session cookies with heavily percent-encoded tokens trip
+# the "double encoding" rule (1315) in the Cookie header - confirmed
+# happening on Nextcloud and CheckMK. Same fix, applied ahead of time.
+BasicRule wl:1000,1001,1005,1007,1010,1011,1013,1100,1101,1200,1308,1309,1310,1311,1315 "mz:$HEADERS_VAR:cookie";
