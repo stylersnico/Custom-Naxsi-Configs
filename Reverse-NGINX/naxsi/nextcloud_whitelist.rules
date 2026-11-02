@@ -1,30 +1,113 @@
-# Nextcloud naxsi whitelist - hand-written, NOT a community-maintained
-# ruleset (none exists for Nextcloud, unlike wordpress_whitelist.rules).
-# Scoped narrowly to fix confirmed false positives from real traffic in
-# naxsi_error.log; only extend when a new false positive is confirmed
-# there, not speculatively.
+# Nextcloud naxsi whitelist - version large, par zones fonctionnelles.
+# ATTENTION : naxsi découpe la matchzone sur "|" -> JAMAIS de (a|b) dans
+# une regex $URL_X / $*_VAR_X. Utiliser des classes [..], des ? ou
+# dupliquer la règle.
+# Préfixe (index\.php/)? = marche avec et sans pretty URLs.
 
-# Nextcloud's session/CSRF cookies are heavily percent-encoded
-# (base64url-ish tokens), tripping the "double encoding" rule (1315)
-# in the Cookie header on nearly every request - it was blocking /login,
-# /apps/files/, even /favicon.ico. Cookie content here is server-set,
-# trusted session data, not user-controlled attacker input, so this is
-# the exact same class of false positive the official wordpress.rules
-# whitelist already accepts for its own cookies - reuse that same rule
-# ID list for the Cookie header.
-BasicRule wl:1000,1001,1005,1007,1010,1011,1013,1100,1101,1200,1308,1309,1310,1311,1315 "mz:$HEADERS_VAR:cookie";
+## ===== GLOBAL =========================================================
 
-# The OCS API (/ocs/v2.php/...) spans dozens of endpoints (calendar,
-# contacts, sharing, notifications...) with varying body content-types
-# that naxsi doesn't always recognize, triggering its internal
-# "unknown content-type" status (id 11) and blocking unconditionally -
-# not a scored attack pattern. Same class of fix as WordPress's
-# wp-cron.php / xmlrpc.php content-type whitelist. Applied broadly for
-# BODY rather than route-by-route, since OCS has too many endpoints to
-# enumerate individually.
+# Cookies session/CSRF (base64url percent-encodé) : données server-set
+BasicRule wl:0 "mz:$HEADERS_VAR:cookie";
+
+# Token CSRF Nextcloud (base64 avec = + / :)
+BasicRule wl:0 "mz:$HEADERS_VAR:requesttoken";
+BasicRule wl:0 "mz:$BODY_VAR:requesttoken";
+BasicRule wl:0 "mz:$ARGS_VAR:requesttoken";
+
+# Basic auth / Bearer (clients desktop/mobile, app passwords)
+BasicRule wl:0 "mz:$HEADERS_VAR:authorization";
+
+# Referer = URLs Nextcloud avec ?dir=/chemin/arbitraire
+BasicRule wl:0 "mz:$HEADERS_VAR:referer";
+
+# Content-type non reconnu par naxsi (OCS, XML DAV, JSON divers)
 BasicRule wl:11 "mz:BODY";
 
-# Preventive (not log-confirmed): a WAF should never content-scan a
-# password field - Nextcloud's login form field is "password". Same
-# reasoning as the CheckMK/WordPress password-field fixes.
+# Noms de paramètres avec [] (shareTypes[]=0, files[]=...)
+BasicRule wl:1310,1311 "mz:ARGS|NAME";
+BasicRule wl:1310,1311 "mz:BODY|NAME";
+
+# Mot de passe : jamais scanné
 BasicRule wl:0 "mz:$BODY_VAR:password";
+
+## ===== ASSETS STATIQUES ===============================================
+# Chunks Vite/Webpack hashés (--, Update, 0x, Select...) sous /dist, /core,
+# /apps/*, /custom_apps/*, /js, /css... ; .php exclu. Couvre aussi ?v=hash.
+BasicRule wl:0 "mz:$URL_X:^/[a-z_]+/.*\.(?!php)[a-z0-9]{1,6}$|URL";
+BasicRule wl:0 "mz:$URL_X:^/[a-z_]+/.*\.(?!php)[a-z0-9]{1,6}$|ARGS";
+# Icônes SVG dynamiques (/svg/core/actions/x?color=...)
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?svg/|URL";
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?svg/|ARGS";
+
+## ===== WEBDAV / CALDAV / CARDDAV ======================================
+# Noms de fichiers arbitraires dans l'URL, contenu binaire / XML en body,
+# uploads chunkés (> client_body_buffer_size -> règle interne 2 "big request")
+BasicRule wl:0 "mz:$URL_X:^/remote\.php/(web)?dav|URL";
+BasicRule wl:0 "mz:$URL_X:^/remote\.php/(web)?dav|ARGS";
+BasicRule wl:0 "mz:$URL_X:^/remote\.php/(web)?dav|BODY";
+BasicRule wl:2,16 "mz:$URL_X:^/remote\.php/(web)?dav|BODY";
+# DAV des partages publics
+BasicRule wl:0 "mz:$URL_X:^/public\.php/(web)?dav|URL";
+BasicRule wl:0 "mz:$URL_X:^/public\.php/(web)?dav|ARGS";
+BasicRule wl:0 "mz:$URL_X:^/public\.php/(web)?dav|BODY";
+BasicRule wl:2,16 "mz:$URL_X:^/public\.php/(web)?dav|BODY";
+
+## ===== APP FICHIERS / PARTAGES / PREVIEWS =============================
+# ?dir= ?file= ?path= ?files= = chemins arbitraires
+# (couvre files, files_sharing, files_versions, files_trashbin, files_pdfviewer)
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/files|ARGS";
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/files|BODY";
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/viewer/|ARGS";
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?core/preview|ARGS";
+# Liens publics /s/{token}?path=...
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?s/[A-Za-z0-9]+|ARGS";
+# API de partage OCS (sharees ?search=, shares body attributes/note/label...)
+BasicRule wl:0 "mz:$URL_X:^/ocs/v[12]\.php/apps/files_sharing/|ARGS";
+BasicRule wl:0 "mz:$URL_X:^/ocs/v[12]\.php/apps/files_sharing/|BODY";
+
+## ===== RECHERCHE ======================================================
+BasicRule wl:0 "mz:$URL_X:^/ocs/v[12]\.php/search/|ARGS";
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?core/search|ARGS";
+
+## ===== ÉDITEURS / CONTENU LIBRE =======================================
+# Text : push/sync/save/create/close, Yjs base64 (steps, awareness,
+# documentState, autosaveContent), pièces jointes, sessions publiques
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/text/|BODY";
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/text/|ARGS";
+BasicRule wl:0 "mz:$URL_X:^/ocs/v[12]\.php/apps/text/|BODY";
+# Notes
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/notes/|BODY";
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/notes/|ARGS";
+# Deck
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/deck/|BODY";
+BasicRule wl:0 "mz:$URL_X:^/ocs/v[12]\.php/apps/deck/|BODY";
+# Talk (messages)
+BasicRule wl:0 "mz:$URL_X:^/ocs/v[12]\.php/apps/spreed/|BODY";
+BasicRule wl:0 "mz:$URL_X:^/ocs/v[12]\.php/apps/spreed/|ARGS";
+# Mail
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/mail/|BODY";
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/mail/|ARGS";
+# Commentaires / Activity / Notifications
+BasicRule wl:0 "mz:$URL_X:^/ocs/v[12]\.php/apps/activity/|ARGS";
+BasicRule wl:0 "mz:$URL_X:^/ocs/v[12]\.php/apps/notifications/|BODY";
+
+## ===== SUITES BUREAUTIQUES (si installées) ============================
+# Collabora : WOPI PutFile = fichier binaire complet
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/richdocuments/|BODY";
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/richdocuments/|ARGS";
+BasicRule wl:2,16 "mz:$URL_X:^/(index\.php/)?apps/richdocuments/|BODY";
+# OnlyOffice
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/onlyoffice/|BODY";
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/onlyoffice/|ARGS";
+BasicRule wl:2,16 "mz:$URL_X:^/(index\.php/)?apps/onlyoffice/|BODY";
+
+## ===== ADMIN / RÉGLAGES ===============================================
+# Config SMTP, theming, mentions légales, profils... (admin authentifié)
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?settings/|BODY";
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?apps/theming/|BODY";
+BasicRule wl:0 "mz:$URL_X:^/ocs/v[12]\.php/cloud/users|BODY";
+BasicRule wl:0 "mz:$URL_X:^/ocs/v[12]\.php/apps/provisioning_api/|BODY";
+
+## ===== LOGIN FLOW (clients) ===========================================
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?login/|ARGS";
+BasicRule wl:0 "mz:$URL_X:^/(index\.php/)?login/|BODY";
